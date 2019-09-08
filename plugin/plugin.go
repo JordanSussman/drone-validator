@@ -34,6 +34,7 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
+// helper function to parse the steps and determine if secret isn't allowed
 func parseSteps(steps []*yaml.Container, secretPath string, secretNames []string, sensitiveImages map[string][]string) error {
 	// loop over all steps
 	for _, step := range steps {
@@ -44,6 +45,21 @@ func parseSteps(steps []*yaml.Container, secretPath string, secretNames []string
 				// check if the image is allowed for the image
 				if !stringInSlice(step.Image, sensitiveImages[secretPath]) {
 					return fmt.Errorf("validator: step %s utilizing unauthorized secret of %s", step.Name, env.Secret)
+				}
+				// check if the step utilizes commands
+				if len(step.Commands) != 0 || len(step.Command) != 0 {
+					return fmt.Errorf("validator: step %s not authorized to utilize commands", step.Name)
+				}
+			}
+		}
+		// TODO: update to utilize function instead of duplication
+		// loop over all settings
+		for _, setting := range step.Settings {
+			// check if the secret is one we care about
+			if stringInSlice(setting.Secret, secretNames) {
+				// check if the image is allowed for the image
+				if !stringInSlice(step.Image, sensitiveImages[secretPath]) {
+					return fmt.Errorf("validator: step %s utilizing unauthorized secret of %s", step.Name, setting.Secret)
 				}
 				// check if the step utilizes commands
 				if len(step.Commands) != 0 || len(step.Command) != 0 {
