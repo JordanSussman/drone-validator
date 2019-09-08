@@ -1,6 +1,6 @@
 # drone-validator
 
-This is a simple PoC of the new [validation extension](https://github.com/drone/boilr-validate) to showcase failings builds if the specified external secret isn't allowed to be used with non whitelisted images, and if the step utilize `command` or `commands` stanza. This extension is merely meant for example purposes, and should **NOT** be utilized in any sort of production environment.
+This is a simple PoC of the new [validation extension](https://github.com/drone/boilr-validate) to showcase failings builds if specific external secret are utilized with non whitelisted images and if the step utilizes `command` or `commands` stanza. This extension is merely meant for example purposes, and should **NOT** be utilized in any sort of production environment.
 
 _Please note this project requires Drone server version 1.4 or higher._
 

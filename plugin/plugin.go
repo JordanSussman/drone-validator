@@ -100,7 +100,7 @@ func (p *plugin) Validate(ctx context.Context, req *validator.Request) error {
 		}
 	}
 
-	// further optimize this by comparing the slice and map from the start
+	// TODO: further optimize this by comparing the slice and map from the start
 	for secretPath, secretNames := range secrets {
 		// validate if the secret referenced is one we care about
 		if _, ok := p.sensitiveImages[secretPath]; ok {
