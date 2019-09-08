@@ -5,10 +5,12 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 
 	"github.com/JordanSussman/drone-validator/plugin"
 	"github.com/drone/drone-go/plugin/validator"
+	"gopkg.in/yaml.v2"
 
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/kelseyhightower/envconfig"
@@ -17,11 +19,15 @@ import (
 
 // spec provides the plugin settings.
 type spec struct {
-	Bind   string `envconfig:"DRONE_BIND"`
-	Debug  bool   `envconfig:"DRONE_DEBUG"`
-	Secret string `envconfig:"DRONE_SECRET"`
+	Bind       string `envconfig:"DRONE_BIND"`
+	Debug      bool   `envconfig:"DRONE_DEBUG"`
+	Secret     string `envconfig:"DRONE_SECRET"`
+	ConfigFile string `envconfig:"DRONE_CONFIG_FILE"`
+}
 
-	DisallowedImages []string `envconfig:"DRONE_DISALLOWED_ENTRYPOINT"`
+// Config contains the secrets and allowed images
+type Config struct {
+	Secrets map[string][]string
 }
 
 func main() {
@@ -41,10 +47,21 @@ func main() {
 		spec.Bind = ":3000"
 	}
 
+	yamlFile, err := ioutil.ReadFile(spec.ConfigFile)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	var config Config
+	err = yaml.Unmarshal(yamlFile, &config)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
 	handler := validator.Handler(
 		spec.Secret,
 		plugin.New(
-			spec.DisallowedImages,
+			config.Secrets,
 		),
 		logrus.StandardLogger(),
 	)

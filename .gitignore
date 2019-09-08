@@ -1,2 +1,4 @@
 .env
 drone-validator
+docker-compose.yml
+config.yml
